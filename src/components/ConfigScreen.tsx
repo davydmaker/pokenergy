@@ -5,6 +5,7 @@ import { DECK_DEFAULTS, DECK_LIMITS } from '../game/constants';
 import { useI18n } from '../i18n/context';
 import LanguageSwitcher from './LanguageSwitcher';
 import EnergyIcon from './EnergyIcon';
+import HelpModal from './HelpModal';
 
 interface Props {
   onStart: (config: DeckConfig) => void;
@@ -24,6 +25,7 @@ export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title
   });
   const [prizeCount, setPrizeCount] = useState<number>(DECK_DEFAULTS.prizeCount);
   const [initialHand, setInitialHand] = useState<number>(DECK_DEFAULTS.initialHand);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const configuredTotal = Object.values(energyCounts).reduce((a, b) => a + b, 0);
   const canStart = configuredTotal === totalEnergy;
@@ -42,6 +44,7 @@ export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title
   return (
     <div className="screen active">
       <LanguageSwitcher />
+      <button className="help-btn" onClick={() => setHelpOpen(true)} aria-label="Help">?</button>
       <div className="logo">{title || t('config.title')}</div>
       <h2>{t('config.subtitle')}</h2>
 
@@ -128,6 +131,8 @@ export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title
           {' '}{t('footer.by')} <a href="https://davydmaker.com" target="_blank" rel="noopener noreferrer">dvd</a>
         </div>
       </footer>
+
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }

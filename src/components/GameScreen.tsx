@@ -9,6 +9,7 @@ import HandTracker from './HandTracker';
 import EnergyBar from './EnergyBar';
 import HistoryLog from './HistoryLog';
 import Modal from './Modal';
+import HelpModal from './HelpModal';
 
 interface Props {
   config: DeckConfig;
@@ -46,6 +47,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   });
   const [modal, setModal] = useState<{ title: string; type: string } | null>(null);
   const [shuffleHandModal, setShuffleHandModal] = useState<{ drawCount: number } | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false);
 
   const turnBlocked = isMyTurn === false;
 
@@ -114,6 +116,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         <button className="back-btn" onClick={() => { if (confirm(t('game.confirmExit'))) onBack(); }}>
           &#8592;
         </button>
+        <button className="help-btn help-btn-game" onClick={() => setHelpOpen(true)} aria-label="Help">?</button>
         <div className="deck-info">
           {playerName && <div style={{ fontWeight: 'bold', color: 'var(--accent)', fontSize: '0.9rem' }}>{playerName}</div>}
           {t('game.deck')} <strong>{gs.deck.length}</strong> {t('game.cards')}
@@ -233,6 +236,8 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
           </div>
         </div>
       )}
+
+      <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
   );
 }

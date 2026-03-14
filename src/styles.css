@@ -37,7 +37,7 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.screen { padding: 16px; max-width: 480px; margin: 0 auto; }
+.screen { padding: 16px; max-width: 480px; margin: 0 auto; position: relative; }
 .text-dim { color: var(--text-dim); }
 
 .logo {
@@ -356,4 +356,63 @@ input[type="number"]:focus { outline: none; border-color: var(--accent); }
 
 .footer a:hover .github-icon {
   opacity: 1;
+}
+
+.help-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--input-border);
+  background: var(--card);
+  color: var(--text-dim);
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+.help-btn:active { background: var(--btn-active); }
+
+.help-btn-game {
+  position: static;
+  width: 28px;
+  height: 28px;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.help-modal {
+  text-align: left;
+}
+.help-section {
+  margin-bottom: 16px;
+}
+.help-section h4 {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin-bottom: 6px;
+}
+.help-section p {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+.help-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.help-list li {
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--text-dim);
+}
+.help-list li strong {
+  color: var(--text);
 }
