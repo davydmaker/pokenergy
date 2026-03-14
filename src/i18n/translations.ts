@@ -117,6 +117,10 @@ const translations = {
     'hist.recoveredEnergy': 'Recuperou energia do descarte: {name}',
     'hist.shuffledHand': 'Embaralhou mão no deck ({handCount} energias) e comprou {drawCount} cartas ({drawnCount} energias)',
     'hist.shuffledHandPublic': 'Embaralhou mão no deck e comprou {drawCount} cartas',
+
+    'footer.legal': 'PokEnergy não é afiliado, endossado, patrocinado ou aprovado pela Nintendo, The Pokémon Company ou Game Freak. Pokémon e todas as marcas relacionadas são marcas registradas de seus respectivos proprietários.',
+    'footer.madeWith': 'feito com',
+    'footer.by': 'por',
   },
 
   en: {
@@ -237,6 +241,10 @@ const translations = {
     'hist.recoveredEnergy': 'Recovered energy from discard: {name}',
     'hist.shuffledHand': 'Shuffled hand into deck ({handCount} energies) and drew {drawCount} cards ({drawnCount} energies)',
     'hist.shuffledHandPublic': 'Shuffled hand into deck and drew {drawCount} cards',
+
+    'footer.legal': 'PokEnergy is not affiliated with, endorsed, sponsored, or approved by Nintendo, The Pokémon Company, or Game Freak. Pokémon and all related marks are trademarks of their respective owners.',
+    'footer.madeWith': 'made with',
+    'footer.by': 'by',
   },
 } as const;
 
