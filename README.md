@@ -70,4 +70,4 @@ For solo play, Firebase is not required.
 
 ## License
 
-MIT
+[GPL](LICENSE)
