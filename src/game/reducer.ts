@@ -9,6 +9,9 @@ export type GameAction =
   | { type: 'DISCARD_FROM_HAND'; typeId: string }
   | { type: 'RECOVER_DISCARD'; typeId: string }
   | { type: 'SHUFFLE_HAND_AND_DRAW'; drawCount: number }
+  | { type: 'SEARCH_DECK_TO_HAND'; typeId: string }
+  | { type: 'SEARCH_DECK_TO_PLAY'; typeId: string }
+  | { type: 'DISCARD_FROM_PLAY'; typeId: string }
   | { type: 'UNDO' }
   | { type: 'SET_STATE'; state: GameState };
 
@@ -190,6 +193,41 @@ export function gameReducer(state: ReducerState, action: GameAction): ReducerSta
           h('hist.shuffledHandPublic', false, { drawCount }, false, true),
           ...gs.history,
         ],
+      });
+    }
+
+    case 'SEARCH_DECK_TO_HAND': {
+      const idx = gs.deck.indexOf(`energy:${action.typeId}` as Card);
+      if (idx === -1) return state;
+      const newDeck = [...gs.deck];
+      newDeck.splice(idx, 1);
+      const newHand = { ...gs.hand };
+      newHand[action.typeId] = (newHand[action.typeId] || 0) + 1;
+      return withUndo(state, {
+        ...gs,
+        deck: shuffle(newDeck),
+        hand: newHand,
+        history: [h('hist.searchedToHand', true, { name: action.typeId }), ...gs.history],
+      });
+    }
+
+    case 'SEARCH_DECK_TO_PLAY': {
+      const idx = gs.deck.indexOf(`energy:${action.typeId}` as Card);
+      if (idx === -1) return state;
+      const newDeck = [...gs.deck];
+      newDeck.splice(idx, 1);
+      return withUndo(state, {
+        ...gs,
+        deck: shuffle(newDeck),
+        history: [h('hist.searchedToPlay', true, { name: action.typeId }), ...gs.history],
+      });
+    }
+
+    case 'DISCARD_FROM_PLAY': {
+      return withUndo(state, {
+        ...gs,
+        discardPile: [...gs.discardPile, action.typeId],
+        history: [h('hist.discardedFromPlay', true, { name: action.typeId }), ...gs.history],
       });
     }
 

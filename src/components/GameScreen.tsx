@@ -48,6 +48,9 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   const [modal, setModal] = useState<{ title: string; type: string } | null>(null);
   const [shuffleHandModal, setShuffleHandModal] = useState<{ drawCount: number } | null>(null);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [searchModal, setSearchModal] = useState(false);
+  const [searchDestModal, setSearchDestModal] = useState<string | null>(null);
+  const [discardFromPlayModal, setDiscardFromPlayModal] = useState(false);
 
   const turnBlocked = isMyTurn === false;
 
@@ -75,6 +78,22 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
     dispatch({ type: 'UNDO' });
     setDrawResult({ type: 'undo' });
   }, [state.undoStack.length, turnBlocked]);
+
+  const handleSearchSelect = useCallback((typeId: string) => {
+    setSearchModal(false);
+    setSearchDestModal(typeId);
+  }, []);
+
+  const handleSearchDestination = useCallback((dest: 'hand' | 'play') => {
+    if (!searchDestModal) return;
+    dispatch({ type: dest === 'hand' ? 'SEARCH_DECK_TO_HAND' : 'SEARCH_DECK_TO_PLAY', typeId: searchDestModal });
+    setSearchDestModal(null);
+  }, [searchDestModal]);
+
+  const handleDiscardFromPlay = useCallback((typeId: string) => {
+    dispatch({ type: 'DISCARD_FROM_PLAY', typeId });
+    setDiscardFromPlayModal(false);
+  }, []);
 
   const handleModalSelect = useCallback((typeId: string) => {
     if (!modal) return;
@@ -153,6 +172,8 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         <button className="btn btn-secondary" onClick={() => setShuffleHandModal({ drawCount: Object.values(gs.hand).reduce((a, b) => a + b, 0) })} disabled={turnBlocked}>
           {t('game.shuffleHand')}
         </button>
+        <button className="btn btn-secondary" onClick={() => setSearchModal(true)} disabled={turnBlocked}>{t('game.searchDeck')}</button>
+        <button className="btn btn-secondary" onClick={() => setDiscardFromPlayModal(true)} disabled={turnBlocked}>{t('game.discardFromPlay')}</button>
         <button className="btn btn-secondary" onClick={handleUndo} disabled={turnBlocked}>{t('game.undo')}</button>
       </div>
 
@@ -236,6 +257,43 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
           </div>
         </div>
       )}
+
+      <Modal
+        open={searchModal}
+        title={t('modal.searchDeck')}
+        onClose={() => setSearchModal(false)}
+        onSelect={handleSearchSelect}
+        energyCounts={countEnergiesInDeck(gs.deck)}
+      />
+
+      {searchDestModal && (
+        <div className="modal-overlay" onClick={() => setSearchDestModal(null)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>{t('modal.searchDestination')}</h3>
+            <div className="modal-actions" style={{ flexDirection: 'column' }}>
+              <button className="btn btn-primary" onClick={() => handleSearchDestination('hand')}>
+                {t('modal.toHand')}
+                <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'normal', opacity: 0.7 }}>{t('modal.toHandDesc')}</span>
+              </button>
+              <button className="btn btn-secondary" onClick={() => handleSearchDestination('play')}>
+                {t('modal.toPlay')}
+                <span style={{ display: 'block', fontSize: '0.75rem', fontWeight: 'normal', opacity: 0.7 }}>{t('modal.toPlayDesc')}</span>
+              </button>
+              <button className="btn btn-secondary" onClick={() => setSearchDestModal(null)}>{t('modal.cancel')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <Modal
+        open={discardFromPlayModal}
+        title={t('modal.discardFromPlay')}
+        onClose={() => setDiscardFromPlayModal(false)}
+        onSelect={handleDiscardFromPlay}
+        energyCounts={Object.fromEntries(
+          Object.entries(gs.config.energyCounts).filter(([, v]) => v > 0).map(([k]) => [k, 1])
+        )}
+      />
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>
