@@ -35,6 +35,9 @@ export default function HelpModal({ open, onClose }: Props) {
             <li><strong>{t('game.shuffleHand')}</strong> — {t('help.btnShuffleHand')}</li>
             <li><strong>{t('game.searchDeck')}</strong> — {t('help.btnSearchDeck')}</li>
             <li><strong>{t('game.discardFromPlay')}</strong> — {t('help.btnDiscardFromPlay')}</li>
+            <li><strong>{t('game.recoverToDeck')}</strong> — {t('help.btnRecoverToDeck')}</li>
+            <li><strong>{t('game.handToPlay')}</strong> — {t('help.btnHandToPlay')}</li>
+            <li><strong>{t('game.flipCoin')}</strong> — {t('help.btnFlipCoin')}</li>
             <li><strong>{t('game.undo')}</strong> — {t('help.btnUndo')}</li>
           </ul>
         </div>

@@ -51,6 +51,8 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   const [searchModal, setSearchModal] = useState(false);
   const [searchDestModal, setSearchDestModal] = useState<string | null>(null);
   const [discardFromPlayModal, setDiscardFromPlayModal] = useState(false);
+  const [recoverToDeckModal, setRecoverToDeckModal] = useState(false);
+  const [handToPlayModal, setHandToPlayModal] = useState(false);
 
   const turnBlocked = isMyTurn === false;
 
@@ -95,6 +97,23 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
     setDiscardFromPlayModal(false);
   }, []);
 
+  const handleRecoverToDeck = useCallback((typeId: string) => {
+    dispatch({ type: 'RECOVER_DISCARD_TO_DECK', typeId });
+    setRecoverToDeckModal(false);
+  }, []);
+
+  const handleHandToPlay = useCallback((typeId: string) => {
+    dispatch({ type: 'HAND_TO_PLAY', typeId });
+    setHandToPlayModal(false);
+  }, []);
+
+  const handleFlipCoin = useCallback(() => {
+    if (turnBlocked) return;
+    const result = Math.random() < 0.5 ? 'heads' : 'tails';
+    dispatch({ type: 'FLIP_COIN', result });
+    setDrawResult({ type: 'coin', result });
+  }, [turnBlocked]);
+
   const handleModalSelect = useCallback((typeId: string) => {
     if (!modal) return;
     switch (modal.type) {
@@ -126,6 +145,8 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
     if (typeof resolved.name === 'string') {
       resolved.name = energyName(resolved.name);
     }
+    if (resolved.result === 'heads') resolved.result = t('hist.coinHeads');
+    if (resolved.result === 'tails') resolved.result = t('hist.coinTails');
     return resolved;
   }
 
@@ -174,6 +195,9 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         </button>
         <button className="btn btn-secondary" onClick={() => setSearchModal(true)} disabled={turnBlocked}>{t('game.searchDeck')}</button>
         <button className="btn btn-secondary" onClick={() => setDiscardFromPlayModal(true)} disabled={turnBlocked}>{t('game.discardFromPlay')}</button>
+        <button className="btn btn-secondary" onClick={() => setRecoverToDeckModal(true)} disabled={turnBlocked}>{t('game.recoverToDeck')}</button>
+        <button className="btn btn-secondary" onClick={() => setHandToPlayModal(true)} disabled={turnBlocked}>{t('game.handToPlay')}</button>
+        <button className="btn btn-warning" onClick={handleFlipCoin} disabled={turnBlocked}>{t('game.flipCoin')}</button>
         <button className="btn btn-secondary" onClick={handleUndo} disabled={turnBlocked}>{t('game.undo')}</button>
       </div>
 
@@ -293,6 +317,22 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         energyCounts={Object.fromEntries(
           Object.entries(gs.config.energyCounts).filter(([, v]) => v > 0).map(([k]) => [k, 1])
         )}
+      />
+
+      <Modal
+        open={recoverToDeckModal}
+        title={t('modal.recoverToDeck')}
+        onClose={() => setRecoverToDeckModal(false)}
+        onSelect={handleRecoverToDeck}
+        energyCounts={discardCounts}
+      />
+
+      <Modal
+        open={handToPlayModal}
+        title={t('modal.handToPlay')}
+        onClose={() => setHandToPlayModal(false)}
+        onSelect={handleHandToPlay}
+        energyCounts={gs.hand}
       />
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />

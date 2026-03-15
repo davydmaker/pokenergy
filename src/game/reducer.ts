@@ -12,6 +12,9 @@ export type GameAction =
   | { type: 'SEARCH_DECK_TO_HAND'; typeId: string }
   | { type: 'SEARCH_DECK_TO_PLAY'; typeId: string }
   | { type: 'DISCARD_FROM_PLAY'; typeId: string }
+  | { type: 'RECOVER_DISCARD_TO_DECK'; typeId: string }
+  | { type: 'HAND_TO_PLAY'; typeId: string }
+  | { type: 'FLIP_COIN'; result: 'heads' | 'tails' }
   | { type: 'UNDO' }
   | { type: 'SET_STATE'; state: GameState };
 
@@ -228,6 +231,40 @@ export function gameReducer(state: ReducerState, action: GameAction): ReducerSta
         ...gs,
         discardPile: [...gs.discardPile, action.typeId],
         history: [h('hist.discardedFromPlay', true, { name: action.typeId }), ...gs.history],
+      });
+    }
+
+    case 'RECOVER_DISCARD_TO_DECK': {
+      const idx = gs.discardPile.indexOf(action.typeId);
+      if (idx === -1) return state;
+      const newDiscard = [...gs.discardPile];
+      newDiscard.splice(idx, 1);
+      const newDeck = shuffle([...gs.deck, `energy:${action.typeId}` as Card]);
+      return withUndo(state, {
+        ...gs,
+        discardPile: newDiscard,
+        deck: newDeck,
+        history: [h('hist.recoveredToDeck', true, { name: action.typeId }), ...gs.history],
+      });
+    }
+
+    case 'HAND_TO_PLAY': {
+      const newHand = { ...gs.hand };
+      if ((newHand[action.typeId] || 0) <= 0) return state;
+      newHand[action.typeId]--;
+      if (newHand[action.typeId] === 0) delete newHand[action.typeId];
+      return withUndo(state, {
+        ...gs,
+        hand: newHand,
+        history: [h('hist.handToPlay', true, { name: action.typeId }), ...gs.history],
+      });
+    }
+
+    case 'FLIP_COIN': {
+      const result = action.result;
+      return withUndo(state, {
+        ...gs,
+        history: [h('hist.coinFlip', false, { result }), ...gs.history],
       });
     }
 

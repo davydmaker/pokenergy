@@ -19,7 +19,7 @@ export const DECK_DEFAULTS = {
 } as const;
 
 export const DECK_LIMITS = {
-  deckSize: { min: 20, max: 125 },
+  deckSize: { min: 20, max: 200 },
   prizeCount: { min: 0, max: 12 },
   initialHand: { min: 1, max: 15 },
 } as const;
