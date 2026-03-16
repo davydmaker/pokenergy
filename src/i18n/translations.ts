@@ -40,6 +40,7 @@ const translations = {
     'game.shuffleHand': 'Embaralhar Mão no Deck',
     'game.energiesInDeck': 'Energias restantes no deck',
     'game.noEnergyInDeck': 'Nenhuma energia no deck',
+    'game.inPlay': 'Em Jogo',
     'game.discard': 'Descarte',
     'game.energyCount': 'energia(s)',
     'game.history': 'Histórico',
@@ -75,6 +76,7 @@ const translations = {
     'modal.confirmDrawDesc': 'Você já comprou uma carta neste turno. Tem certeza que deseja comprar outra?',
     'modal.confirmUndoTitle': 'Desfazer ação?',
     'modal.confirmUndoDesc': 'Tem certeza que deseja desfazer a última ação?',
+    'modal.confirmExitTitle': 'Sair do jogo?',
 
     'draw.start': 'Puxe uma carta para começar',
     'draw.basicEnergy': 'ENERGIA BÁSICA!',
@@ -216,6 +218,7 @@ const translations = {
     'game.shuffleHand': 'Shuffle Hand into Deck',
     'game.energiesInDeck': 'Energies remaining in deck',
     'game.noEnergyInDeck': 'No energy in deck',
+    'game.inPlay': 'In Play',
     'game.discard': 'Discard Pile',
     'game.energyCount': 'energy(ies)',
     'game.history': 'History',
@@ -251,6 +254,7 @@ const translations = {
     'modal.confirmDrawDesc': 'You already drew a card this turn. Are you sure you want to draw another?',
     'modal.confirmUndoTitle': 'Undo action?',
     'modal.confirmUndoDesc': 'Are you sure you want to undo the last action?',
+    'modal.confirmExitTitle': 'Leave game?',
 
     'draw.start': 'Draw a card to begin',
     'draw.basicEnergy': 'BASIC ENERGY!',

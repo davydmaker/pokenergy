@@ -56,6 +56,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   const [drewThisTurn, setDrewThisTurn] = useState(false);
   const [confirmDraw, setConfirmDraw] = useState(false);
   const [confirmUndo, setConfirmUndo] = useState(false);
+  const [confirmExit, setConfirmExit] = useState(false);
 
   const prevIsMyTurn = useRef(isMyTurn);
   useEffect(() => {
@@ -148,6 +149,15 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   const discardCounts: Record<string, number> = {};
   gs.discardPile.forEach(id => { discardCounts[id] = (discardCounts[id] || 0) + 1; });
 
+  const deckEnergyCounts = countEnergiesInDeck(gs.deck);
+  const inPlayCounts: Record<string, number> = {};
+  let inPlayTotal = 0;
+  for (const [id, total] of Object.entries(gs.config.energyCounts)) {
+    if (total <= 0) continue;
+    const count = total - (deckEnergyCounts[id] || 0) - (gs.hand[id] || 0) - (discardCounts[id] || 0);
+    if (count > 0) { inPlayCounts[id] = count; inPlayTotal += count; }
+  }
+
   function getModalCounts() {
     if (!modal) return {};
     switch (modal.type) {
@@ -171,7 +181,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   return (
     <div className="screen active">
       <div className="game-header">
-        <button className="back-btn" onClick={() => { if (confirm(t('game.confirmExit'))) onBack(); }}>
+        <button className="back-btn" onClick={() => setConfirmExit(true)}>
           &#8592;
         </button>
         <button className="help-btn help-btn-game" onClick={() => setHelpOpen(true)} aria-label="Help">?</button>
@@ -219,9 +229,18 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         <button className="btn btn-secondary" onClick={handleUndo} disabled={turnBlocked}>{t('game.undo')}</button>
       </div>
 
+      {inPlayTotal > 0 && (
+        <div className="panel">
+          <h3 style={{ display: 'flex', justifyContent: 'space-between' }}>
+            {t('game.inPlay')} <span style={{ fontSize: '0.8rem' }}>{inPlayTotal} {t('game.energyCount')}</span>
+          </h3>
+          <EnergyBar counts={inPlayCounts} />
+        </div>
+      )}
+
       <div className="panel">
         <h3>{t('game.energiesInDeck')}</h3>
-        <EnergyBar counts={countEnergiesInDeck(gs.deck)} emptyText={t('game.noEnergyInDeck')} />
+        <EnergyBar counts={deckEnergyCounts} emptyText={t('game.noEnergyInDeck')} />
       </div>
 
       <div className="panel">
@@ -305,7 +324,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         title={t('modal.searchDeck')}
         onClose={() => setSearchModal(false)}
         onSelect={handleSearchSelect}
-        energyCounts={countEnergiesInDeck(gs.deck)}
+        energyCounts={deckEnergyCounts}
       />
 
       {searchDestModal && (
@@ -332,19 +351,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         title={t('modal.discardFromPlay')}
         onClose={() => setDiscardFromPlayModal(false)}
         onSelect={handleDiscardFromPlay}
-        energyCounts={(() => {
-          const deckCounts = countEnergiesInDeck(gs.deck);
-          const inPlay: Record<string, number> = {};
-          for (const [id, total] of Object.entries(gs.config.energyCounts)) {
-            if (total <= 0) continue;
-            const inDeck = deckCounts[id] || 0;
-            const inHand = gs.hand[id] || 0;
-            const inDiscard = discardCounts[id] || 0;
-            const count = total - inDeck - inHand - inDiscard;
-            if (count > 0) inPlay[id] = count;
-          }
-          return inPlay;
-        })()}
+        energyCounts={inPlayCounts}
       />
 
       <Modal
@@ -362,6 +369,21 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         onSelect={handleHandToPlay}
         energyCounts={gs.hand}
       />
+
+      {confirmExit && (
+        <div className="modal-overlay" onClick={() => setConfirmExit(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>{t('modal.confirmExitTitle')}</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: 12, textAlign: 'center' }}>
+              {t('game.confirmExit')}
+            </p>
+            <div className="modal-actions">
+              <button className="btn btn-secondary" onClick={() => setConfirmExit(false)}>{t('modal.cancel')}</button>
+              <button className="btn btn-primary" onClick={() => { setConfirmExit(false); onBack(); }}>{t('modal.confirm')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {confirmDraw && (
         <div className="modal-overlay" onClick={() => setConfirmDraw(false)}>

@@ -9,12 +9,14 @@ In Pokemon TCG, energy cards power your Pokemon's attacks. PokEnergy replaces yo
 ## Features
 
 - **Virtual energy deck** — configure deck size, total energies, and distribution by type
-- **10 energy types** — Fire, Water, Grass, Lightning, Psychic, Fighting, Darkness, Metal, Fairy, Dragon
-- **Draw simulation** — draws a card and tells you if it's energy (use marker) or not (draw physical card)
 - **Hand tracking** — tracks energies in your hand with discard and recover actions
+- **Hand to play** — move energy from hand to the table (attach to a Pokemon)
+- **Search deck** — find a specific energy in the deck and send it to hand or straight to play
+- **Discard from play** — send energies from the table to the discard pile (knockout, attack cost, etc.)
+- **Recover to deck** — return energies from the discard pile back to the deck
 - **Shuffle hand into deck** — return hand energies to deck, shuffle, and draw new cards
-- **Prize cards** — remove cards from the virtual deck to match your prize pile
-- **Undo support** — undo up to 30 actions
+- **Coin flip** — virtual coin flip with heads/tails result visible to all players
+- **Undo support** — undo up to 30 actions with confirmation
 - **Game history** — log of all actions taken during the game
 - **Multiplayer** — create or join rooms via Firebase, play with turn-based flow
 - **Share rooms via URL** — link with room code in the hash for easy sharing
@@ -67,6 +69,10 @@ For solo play, Firebase is not required.
    - **Energy** — the app tells you the type; use a marker token instead of a physical card
    - **Not energy** — draw the physical card from your real deck
 4. Manage your hand: discard energies, recover from discard pile, or shuffle hand back into the deck
+5. Move energies from hand to play when attaching to a Pokemon
+6. Search your deck for a specific energy type when a Trainer card allows it
+7. Discard energies from play when a Pokemon is knocked out or pays an attack cost
+8. Flip a coin when game mechanics require it
 
 ## License
 
