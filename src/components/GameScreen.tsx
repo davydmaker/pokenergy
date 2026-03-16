@@ -53,11 +53,21 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   const [discardFromPlayModal, setDiscardFromPlayModal] = useState(false);
   const [recoverToDeckModal, setRecoverToDeckModal] = useState(false);
   const [handToPlayModal, setHandToPlayModal] = useState(false);
+  const [drewThisTurn, setDrewThisTurn] = useState(false);
+  const [confirmDraw, setConfirmDraw] = useState(false);
+  const [confirmUndo, setConfirmUndo] = useState(false);
+
+  const prevIsMyTurn = useRef(isMyTurn);
+  useEffect(() => {
+    if (isMyTurn === true && prevIsMyTurn.current === false) {
+      setDrewThisTurn(false);
+    }
+    prevIsMyTurn.current = isMyTurn;
+  }, [isMyTurn]);
 
   const turnBlocked = isMyTurn === false;
 
-  const handleDraw = useCallback(() => {
-    if (turnBlocked) return;
+  const executeDraw = useCallback(() => {
     if (gs.deck.length === 0) {
       setDrawResult({ type: 'empty' });
       return;
@@ -66,7 +76,17 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
     const energyId = getEnergyId(card);
     dispatch({ type: 'DRAW_CARD' });
     setDrawResult(energyId ? { type: 'energy', energyId } : { type: 'not-energy' });
-  }, [gs.deck, turnBlocked]);
+    setDrewThisTurn(true);
+  }, [gs.deck]);
+
+  const handleDraw = useCallback(() => {
+    if (turnBlocked) return;
+    if (drewThisTurn) {
+      setConfirmDraw(true);
+      return;
+    }
+    executeDraw();
+  }, [turnBlocked, drewThisTurn, executeDraw]);
 
   const handleShuffle = useCallback(() => {
     if (turnBlocked) return;
@@ -77,8 +97,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   const handleUndo = useCallback(() => {
     if (turnBlocked) return;
     if (state.undoStack.length === 0) return;
-    dispatch({ type: 'UNDO' });
-    setDrawResult({ type: 'undo' });
+    setConfirmUndo(true);
   }, [state.undoStack.length, turnBlocked]);
 
   const handleSearchSelect = useCallback((typeId: string) => {
@@ -108,11 +127,10 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
   }, []);
 
   const handleFlipCoin = useCallback(() => {
-    if (turnBlocked) return;
     const result = Math.random() < 0.5 ? 'heads' : 'tails';
     dispatch({ type: 'FLIP_COIN', result });
     setDrawResult({ type: 'coin', result });
-  }, [turnBlocked]);
+  }, []);
 
   const handleModalSelect = useCallback((typeId: string) => {
     if (!modal) return;
@@ -197,7 +215,7 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         <button className="btn btn-secondary" onClick={() => setDiscardFromPlayModal(true)} disabled={turnBlocked}>{t('game.discardFromPlay')}</button>
         <button className="btn btn-secondary" onClick={() => setRecoverToDeckModal(true)} disabled={turnBlocked}>{t('game.recoverToDeck')}</button>
         <button className="btn btn-secondary" onClick={() => setHandToPlayModal(true)} disabled={turnBlocked}>{t('game.handToPlay')}</button>
-        <button className="btn btn-warning" onClick={handleFlipCoin} disabled={turnBlocked}>{t('game.flipCoin')}</button>
+        <button className="btn btn-warning" onClick={handleFlipCoin}>{t('game.flipCoin')}</button>
         <button className="btn btn-secondary" onClick={handleUndo} disabled={turnBlocked}>{t('game.undo')}</button>
       </div>
 
@@ -314,9 +332,19 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         title={t('modal.discardFromPlay')}
         onClose={() => setDiscardFromPlayModal(false)}
         onSelect={handleDiscardFromPlay}
-        energyCounts={Object.fromEntries(
-          Object.entries(gs.config.energyCounts).filter(([, v]) => v > 0).map(([k]) => [k, 1])
-        )}
+        energyCounts={(() => {
+          const deckCounts = countEnergiesInDeck(gs.deck);
+          const inPlay: Record<string, number> = {};
+          for (const [id, total] of Object.entries(gs.config.energyCounts)) {
+            if (total <= 0) continue;
+            const inDeck = deckCounts[id] || 0;
+            const inHand = gs.hand[id] || 0;
+            const inDiscard = discardCounts[id] || 0;
+            const count = total - inDeck - inHand - inDiscard;
+            if (count > 0) inPlay[id] = count;
+          }
+          return inPlay;
+        })()}
       />
 
       <Modal
@@ -334,6 +362,36 @@ export default function GameScreen({ config, onBack, playerName, isMyTurn, onPas
         onSelect={handleHandToPlay}
         energyCounts={gs.hand}
       />
+
+      {confirmDraw && (
+        <div className="modal-overlay" onClick={() => setConfirmDraw(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>{t('modal.confirmDrawTitle')}</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: 12, textAlign: 'center' }}>
+              {t('modal.confirmDrawDesc')}
+            </p>
+            <div className="modal-actions">
+              <button className="btn btn-secondary" onClick={() => setConfirmDraw(false)}>{t('modal.cancel')}</button>
+              <button className="btn btn-primary" onClick={() => { setConfirmDraw(false); executeDraw(); }}>{t('modal.confirm')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmUndo && (
+        <div className="modal-overlay" onClick={() => setConfirmUndo(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <h3>{t('modal.confirmUndoTitle')}</h3>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', marginBottom: 12, textAlign: 'center' }}>
+              {t('modal.confirmUndoDesc')}
+            </p>
+            <div className="modal-actions">
+              <button className="btn btn-secondary" onClick={() => setConfirmUndo(false)}>{t('modal.cancel')}</button>
+              <button className="btn btn-primary" onClick={() => { setConfirmUndo(false); dispatch({ type: 'UNDO' }); setDrawResult({ type: 'undo' }); }}>{t('modal.confirm')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
     </div>

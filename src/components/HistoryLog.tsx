@@ -15,6 +15,8 @@ export default function HistoryLog({ history }: Props) {
     if (typeof resolved.name === 'string') {
       resolved.name = energyName(resolved.name);
     }
+    if (resolved.result === 'heads') resolved.result = t('hist.coinHeads');
+    if (resolved.result === 'tails') resolved.result = t('hist.coinTails');
     return resolved;
   }
 

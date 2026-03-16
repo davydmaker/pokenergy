@@ -70,6 +70,11 @@ const translations = {
     'modal.shuffleHandTitle': 'Embaralhar mão no deck e comprar',
     'modal.shuffleHandDesc': 'Energias da mão voltam para o deck, embaralha, e compra novas cartas.',
     'modal.howManyCards': 'Comprar quantas cartas:',
+    'modal.noEnergies': 'Nenhuma energia disponível',
+    'modal.confirmDrawTitle': 'Comprar outra carta?',
+    'modal.confirmDrawDesc': 'Você já comprou uma carta neste turno. Tem certeza que deseja comprar outra?',
+    'modal.confirmUndoTitle': 'Desfazer ação?',
+    'modal.confirmUndoDesc': 'Tem certeza que deseja desfazer a última ação?',
 
     'draw.start': 'Puxe uma carta para começar',
     'draw.basicEnergy': 'ENERGIA BÁSICA!',
@@ -241,6 +246,11 @@ const translations = {
     'modal.shuffleHandTitle': 'Shuffle hand into deck and draw',
     'modal.shuffleHandDesc': 'Hand energies go back to deck, shuffle, and draw new cards.',
     'modal.howManyCards': 'How many cards to draw:',
+    'modal.noEnergies': 'No energies available',
+    'modal.confirmDrawTitle': 'Draw another card?',
+    'modal.confirmDrawDesc': 'You already drew a card this turn. Are you sure you want to draw another?',
+    'modal.confirmUndoTitle': 'Undo action?',
+    'modal.confirmUndoDesc': 'Are you sure you want to undo the last action?',
 
     'draw.start': 'Draw a card to begin',
     'draw.basicEnergy': 'BASIC ENERGY!',
