@@ -1,78 +1,90 @@
 # PokEnergy
 
-Virtual Energy Deck for Pokemon TCG — track your energy cards digitally without needing a physical energy deck.
+Virtual energy deck for Pokemon TCG.
 
-## What is this?
+Bought some boosters but don't have enough energy cards to play? PokEnergy solves that. It simulates your energy deck on your phone — just bring your Pokemon and Trainer cards. When you draw an energy, use a marker (die, token, coin) instead of a physical card.
 
-In Pokemon TCG, energy cards power your Pokemon's attacks. PokEnergy replaces your physical energy deck with a virtual one, so you only need to carry your Pokemon and Trainer cards. When you draw an energy, the app tells you to use a marker instead of a physical card.
+Works solo or multiplayer. Bilingual (PT/EN). Light and dark theme.
+
+## How it works
+
+1. Set up your deck: size, energy count and distribution by type
+2. Set prize cards and initial hand size
+3. Each turn, draw a card:
+   - **Energy** — the app shows the type, use a marker on the table
+   - **Not energy** — draw the physical card from your real deck
+4. Manage energies: discard, recover, shuffle hand, search deck, move between hand/play/discard
+5. Flip the coin when needed
 
 ## Features
 
-- **Virtual energy deck** — configure deck size, total energies, and distribution by type
-- **Hand tracking** — tracks energies in your hand with discard and recover actions
-- **Hand to play** — move energy from hand to the table (attach to a Pokemon)
-- **Search deck** — find a specific energy in the deck and send it to hand or straight to play
-- **Discard from play** — send energies from the table to the discard pile (knockout, attack cost, etc.)
-- **Recover to deck** — return energies from the discard pile back to the deck
-- **Shuffle hand into deck** — return hand energies to deck, shuffle, and draw new cards
-- **Coin flip** — virtual coin flip with heads/tails result visible to all players
-- **Undo support** — undo up to 30 actions with confirmation
-- **Game history** — log of all actions taken during the game
-- **Multiplayer** — create or join rooms via Firebase, play with turn-based flow
-- **Share rooms via URL** — link with room code in the hash for easy sharing
-- **Bilingual** — Portuguese and English
-- **Dark/Light theme**
-- **Mobile-friendly** — designed for use during tabletop play
+**Deck & hand**
+- Full deck configuration (size, energies, distribution, prizes, initial hand)
+- Draw confirmation on second draw per turn
+- Deck search with destination (hand or straight to play)
+- Shuffle hand into deck and draw new cards
+- Undo up to 30 actions
 
-## Tech Stack
+**Energies in play**
+- Move energy from hand to play (attach to a Pokemon)
+- Discard from play (knockout, attack cost)
+- Recover from discard to hand or deck
+- Panel showing energies in play, in deck and in discard
+
+**Multiplayer**
+- Rooms via Firebase with turn-based flow
+- Share room by URL
+- Action history visible between players
+- Coin flip result visible to all
+- Old rooms auto-deleted when host creates a new one
+
+**General**
+- Virtual coin flip (heads/tails)
+- Full action history
+- In-app help explaining all mechanics
+- Portuguese and English
+- Light/dark theme
+- Mobile-first
+
+## Stack
 
 - React 19 + TypeScript
 - Vite
-- Firebase (Firestore for multiplayer)
+- Firebase (Firestore + Anonymous Auth)
 
-## Getting Started
+## Setup
 
 ```bash
-# Install dependencies
 npm install
-
-# Copy env file and fill in your Firebase credentials
 cp .env.example .env
-
-# Start dev server
 npm run dev
 ```
 
-### Firebase Setup (for multiplayer)
+### Firebase (for multiplayer)
 
 1. Create a project at [Firebase Console](https://console.firebase.google.com)
 2. Enable Firestore Database
 3. Enable Authentication > Anonymous sign-in
 4. Copy your web app credentials to `.env`
+5. Deploy rules: `firebase deploy --only firestore:rules`
 
-For solo play, Firebase is not required.
+Solo mode doesn't need Firebase.
+
+### Security
+
+- Anonymous auth required for all Firestore operations
+- Security rules enforce field immutability, player limits, role-based access and valid status transitions
+- Old rooms from the same host are auto-deleted when creating a new room
+- Optional TTL (requires Blaze plan): configure a policy on the `expireAt` field for automatic cleanup of abandoned rooms
 
 ## Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Start development server |
-| `npm run build` | Type-check and build for production |
-| `npm run preview` | Preview production build |
-| `npm run lint` | Run ESLint |
-
-## How It Works
-
-1. Configure your deck: set total cards, number of energies, and how they're distributed across types
-2. Optionally set prize cards and initial hand size
-3. Each turn, draw a card:
-   - **Energy** — the app tells you the type; use a marker token instead of a physical card
-   - **Not energy** — draw the physical card from your real deck
-4. Manage your hand: discard energies, recover from discard pile, or shuffle hand back into the deck
-5. Move energies from hand to play when attaching to a Pokemon
-6. Search your deck for a specific energy type when a Trainer card allows it
-7. Discard energies from play when a Pokemon is knocked out or pays an attack cost
-8. Flip a coin when game mechanics require it
+| `npm run dev` | Dev server |
+| `npm run build` | Type-check + build |
+| `npm run preview` | Preview build |
+| `npm run lint` | ESLint |
 
 ## License
 

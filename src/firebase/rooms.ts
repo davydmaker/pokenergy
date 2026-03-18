@@ -1,4 +1,4 @@
-import { doc, setDoc, getDoc, updateDoc, onSnapshot, runTransaction, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, updateDoc, deleteDoc, onSnapshot, runTransaction, serverTimestamp, Timestamp, collection, query, where, getDocs } from 'firebase/firestore';
 import { db, getPlayerId } from './config';
 import type { Room, GameState } from '../game/types';
 import { generateRoomCode } from '../game/engine';
@@ -6,6 +6,7 @@ import { MAX_PLAYERS, UPDATE_THROTTLE_MS } from '../game/constants';
 
 const ROOMS_COLLECTION = 'rooms';
 const MAX_NAME_LENGTH = 50;
+const ROOM_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function sanitizeName(name: string): string {
   return name.slice(0, MAX_NAME_LENGTH).trim();
@@ -28,8 +29,23 @@ function throttledUpdate(fn: () => Promise<void>) {
   }, UPDATE_THROTTLE_MS);
 }
 
+async function cleanupOldRooms(playerId: string) {
+  try {
+    const q = query(
+      collection(db, ROOMS_COLLECTION),
+      where('hostId', '==', playerId)
+    );
+    const snap = await getDocs(q);
+    const deletes = snap.docs.map(d => deleteDoc(d.ref));
+    await Promise.all(deletes);
+  } catch {
+    // Cleanup is best-effort, don't block room creation
+  }
+}
+
 export async function createRoom(hostName: string): Promise<{ roomId: string; playerId: string }> {
   const playerId = await getPlayerId();
+  await cleanupOldRooms(playerId);
   let roomId = generateRoomCode();
 
   const existingSnap = await getDoc(doc(db, ROOMS_COLLECTION, roomId));
@@ -53,6 +69,7 @@ export async function createRoom(hostName: string): Promise<{ roomId: string; pl
       },
     },
     createdAt: Date.now(),
+    expireAt: Timestamp.fromMillis(Date.now() + ROOM_TTL_MS),
   };
 
   await setDoc(doc(db, ROOMS_COLLECTION, roomId), room);

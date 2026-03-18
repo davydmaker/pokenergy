@@ -4,46 +4,62 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     match /rooms/{roomId} {
-      // Allow fetching a room by code, but not listing all rooms
+      // Fetch a room by code
       allow get: if request.auth != null;
-      allow list: if false;
+      // List only own rooms (query must filter by hostId == uid)
+      allow list: if request.auth != null
+                  && resource.data.hostId == request.auth.uid;
 
-      // Create room: hostId = uid, status = waiting, name < 50 chars
+      // Create: validate structure, host ownership, and initial state
       allow create: if request.auth != null
                     && request.resource.data.hostId == request.auth.uid
+                    && request.resource.data.id == roomId
                     && request.resource.data.status == 'waiting'
-                    && request.resource.data.keys().hasAll(['id', 'hostId', 'status', 'currentTurn', 'turnOrder', 'players', 'createdAt'])
-                    && request.resource.data.players[request.auth.uid].name.size() < 50;
+                    && request.resource.data.keys().hasAll(['id', 'hostId', 'status', 'currentTurn', 'turnOrder', 'players', 'createdAt', 'expireAt'])
+                    && request.resource.data.players.size() == 1
+                    && request.resource.data.turnOrder.size() == 1
+                    && request.resource.data.players[request.auth.uid].name.size() < 50
+                    && request.resource.data.createdAt is number
+                    && request.resource.data.expireAt is timestamp;
 
-      // Update: role-based rules (host vs player vs new player)
+      // Update: role-based, immutable fields enforced
       allow update: if request.auth != null
+                    // Immutable fields
                     && request.resource.data.hostId == resource.data.hostId
                     && request.resource.data.id == resource.data.id
+                    && request.resource.data.createdAt == resource.data.createdAt
+                    && request.resource.data.expireAt == resource.data.expireAt
+                    // Max 2 players
+                    && request.resource.data.players.size() <= 2
                     && (
-                      // New player joining (room in waiting status)
+                      // --- New player joining ---
                       (
                         resource.data.status == 'waiting'
                         && !(request.auth.uid in resource.data.players)
                         && request.auth.uid in request.resource.data.players
                         && request.resource.data.players[request.auth.uid].name.size() < 50
+                        && request.resource.data.players.size() == resource.data.players.size() + 1
+                        && request.resource.data.turnOrder.size() == resource.data.turnOrder.size() + 1
                         && request.resource.data.status == resource.data.status
                         && request.resource.data.currentTurn == resource.data.currentTurn
+                        // Preserve host data
+                        && request.resource.data.players[resource.data.hostId] == resource.data.players[resource.data.hostId]
                       )
-                      // Host can change status (valid transitions only)
+                      // --- Host status transitions ---
                       || (
                         request.auth.uid == resource.data.hostId
-                        && request.auth.uid in resource.data.players
                         && (
                           (resource.data.status == 'waiting' && request.resource.data.status == 'configuring')
                           || (resource.data.status == 'configuring' && request.resource.data.status == 'playing')
                           || request.resource.data.status == resource.data.status
                         )
                       )
-                      // Existing player can only update their own data
+                      // --- Existing player updating own data only ---
                       || (
                         request.auth.uid in resource.data.players
                         && request.resource.data.status == resource.data.status
                         && request.resource.data.turnOrder == resource.data.turnOrder
+                        && request.resource.data.players.size() == resource.data.players.size()
                       )
                     );
 
@@ -52,6 +68,7 @@ service cloud.firestore {
                     && resource.data.hostId == request.auth.uid;
     }
 
+    // Deny everything else
     match /{document=**} {
       allow read, write: if false;
     }

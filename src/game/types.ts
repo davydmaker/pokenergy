@@ -61,4 +61,5 @@ export interface Room {
   turnOrder: string[];
   players: Record<string, PlayerState>;
   createdAt: number;
+  expireAt: unknown;
 }
