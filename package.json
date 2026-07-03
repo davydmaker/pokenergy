@@ -4,7 +4,10 @@
   "description": "Virtual Energy Deck for Pokemon TCG - Track energy cards without physical decks",
   "type": "module",
   "license": "MIT",
-  "author": "davydmaker",
+  "author": {
+    "name": "Beater Studios",
+    "url": "https://beaterstudios.com"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/davydmaker/pokenergy"

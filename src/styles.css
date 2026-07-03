@@ -340,6 +340,37 @@ input[type="number"]:focus { outline: none; border-color: var(--accent); }
   font-weight: 600;
 }
 .footer-credits a:hover { text-decoration: underline; }
+.footer-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.72rem;
+}
+.footer-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: var(--text-dim);
+  font: inherit;
+  text-decoration: underline;
+  opacity: 0.9;
+}
+.footer-link:hover { color: var(--accent); }
+.footer-link-sep { opacity: 0.5; }
+.legal-updated {
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-bottom: 12px;
+}
+.help-section a {
+  color: var(--accent);
+  text-decoration: underline;
+  word-break: break-word;
+}
 .footer .heart {
   width: 14px;
   height: 14px;

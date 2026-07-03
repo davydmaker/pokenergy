@@ -6,6 +6,7 @@ import { useI18n } from '../i18n/context';
 import LanguageSwitcher from './LanguageSwitcher';
 import EnergyIcon from './EnergyIcon';
 import HelpModal from './HelpModal';
+import LegalModal, { type LegalType } from './LegalModal';
 
 interface Props {
   onStart: (config: DeckConfig) => void;
@@ -26,6 +27,7 @@ export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title
   const [prizeCount, setPrizeCount] = useState<number>(DECK_DEFAULTS.prizeCount);
   const [initialHand, setInitialHand] = useState<number>(DECK_DEFAULTS.initialHand);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [legalOpen, setLegalOpen] = useState<LegalType | null>(null);
 
   const configuredTotal = Object.values(energyCounts).reduce((a, b) => a + b, 0);
   const canStart = configuredTotal === totalEnergy;
@@ -128,11 +130,17 @@ export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title
           <svg className="heart" viewBox="0 0 24 24" fill="var(--accent)">
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
-          {' '}{t('footer.by')} <a href="https://davydmaker.com" target="_blank" rel="noopener noreferrer">dvd</a>
+          {' '}{t('footer.by')} <a href="https://beaterstudios.com" target="_blank" rel="noopener noreferrer">Beater Studios</a>
+        </div>
+        <div className="footer-links">
+          <button type="button" className="footer-link" onClick={() => setLegalOpen('terms')}>{t('footer.terms')}</button>
+          <span className="footer-link-sep">·</span>
+          <button type="button" className="footer-link" onClick={() => setLegalOpen('privacy')}>{t('footer.privacy')}</button>
         </div>
       </footer>
 
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
+      {legalOpen && <LegalModal type={legalOpen} open onClose={() => setLegalOpen(null)} />}
     </div>
   );
 }
