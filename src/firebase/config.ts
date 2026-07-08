@@ -1,6 +1,7 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAuth, signInAnonymously, onAuthStateChanged } from 'firebase/auth';
+import { initializeApp, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getAuth, signInAnonymously, onAuthStateChanged, type Auth } from 'firebase/auth';
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -10,14 +11,39 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+// Sandbox mode: when the Firebase env vars are absent (e.g. local dev without a
+// Firebase project), we skip initialization entirely so solo mode still works.
+// Only multiplayer requires Firebase.
+export const isFirebaseConfigured = Boolean(
+  firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId,
+);
 
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+let app: FirebaseApp | null = null;
+let dbInstance: Firestore | null = null;
+let authInstance: Auth | null = null;
+
+if (isFirebaseConfigured) {
+  app = initializeApp(firebaseConfig);
+  dbInstance = getFirestore(app);
+  authInstance = getAuth(app);
+} else {
+  console.warn(
+    '[PokEnergy] Firebase not configured — running in sandbox mode. ' +
+      'Solo play works; multiplayer is disabled. Set the VITE_FIREBASE_* env vars to enable it.',
+  );
+}
+
+// Non-null assertions are safe: these are only consumed by multiplayer code
+// paths, which are gated behind `isFirebaseConfigured` in the UI.
+export const db = dbInstance as Firestore;
+export const auth = authInstance as Auth;
 
 let playerIdPromise: Promise<string> | null = null;
 
 export function getPlayerId(): Promise<string> {
+  if (!isFirebaseConfigured) {
+    return Promise.reject(new Error('Firebase not configured (sandbox mode)'));
+  }
   if (playerIdPromise) return playerIdPromise;
 
   playerIdPromise = new Promise<string>((resolve, reject) => {

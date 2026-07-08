@@ -13,9 +13,10 @@ interface Props {
   onMultiplayer?: () => void;
   startLabel?: string;
   title?: string;
+  sandbox?: boolean;
 }
 
-export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title }: Props) {
+export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title, sandbox }: Props) {
   const { t, energyName } = useI18n();
   const [deckSize, setDeckSize] = useState<number>(DECK_DEFAULTS.deckSize);
   const [totalEnergy, setTotalEnergy] = useState<number>(DECK_DEFAULTS.totalEnergy);
@@ -115,6 +116,9 @@ export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title
           {t('config.multiplayer')}
         </button>
       )}
+      {sandbox && (
+        <div className="sandbox-note">{t('config.sandboxNote')}</div>
+      )}
 
       <footer className="footer">
         <div className="footer-legal">
@@ -132,6 +136,14 @@ export default function ConfigScreen({ onStart, onMultiplayer, startLabel, title
           </svg>
           {' '}{t('footer.by')} <a href="https://beaterstudios.com" target="_blank" rel="noopener noreferrer">Beater Studios</a>
         </div>
+        <a className="kofi-btn" href="https://ko-fi.com/beaterstudios" target="_blank" rel="noopener noreferrer">
+          <svg className="kofi-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M17 8h1a4 4 0 1 1 0 8h-1" />
+            <path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z" />
+            <path d="M6 2v2M10 2v2M14 2v2" />
+          </svg>
+          {t('footer.kofi')}
+        </a>
         <div className="footer-links">
           <button type="button" className="footer-link" onClick={() => setLegalOpen('terms')}>{t('footer.terms')}</button>
           <span className="footer-link-sep">·</span>

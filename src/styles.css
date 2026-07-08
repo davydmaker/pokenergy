@@ -340,6 +340,41 @@ input[type="number"]:focus { outline: none; border-color: var(--accent); }
   font-weight: 600;
 }
 .footer-credits a:hover { text-decoration: underline; }
+.sandbox-note {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 8px;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--text-dim);
+  text-align: center;
+}
+.kofi-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 42px;
+  margin: 14px 0 4px;
+  padding: 0 18px;
+  background: #ff5e5b;
+  color: #fff;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  opacity: 1;
+  transition: background 0.2s, transform 0.1s;
+}
+.kofi-btn:hover { background: #ff4542; }
+.kofi-btn:active { transform: scale(0.97); }
+.kofi-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
 .footer-links {
   display: flex;
   align-items: center;

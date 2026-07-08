@@ -26,6 +26,7 @@ const translations = {
     'config.playSolo': 'Jogar Solo',
     'config.multiplayer': 'Multiplayer',
     'config.confirmDeck': 'Confirmar Deck',
+    'config.sandboxNote': 'Modo sandbox: multiplayer desativado porque o Firebase não está configurado. O modo solo funciona normalmente.',
 
     'game.deck': 'Deck:',
     'game.cards': 'cartas',
@@ -156,6 +157,7 @@ const translations = {
     'footer.by': 'por',
     'footer.terms': 'Termos de Uso',
     'footer.privacy': 'Política de Privacidade',
+    'footer.kofi': 'Apoie no Ko-fi',
     'legal.close': 'Fechar',
 
     'help.title': 'Como funciona?',
@@ -243,6 +245,7 @@ const translations = {
     'config.playSolo': 'Play Solo',
     'config.multiplayer': 'Multiplayer',
     'config.confirmDeck': 'Confirm Deck',
+    'config.sandboxNote': 'Sandbox mode: multiplayer is disabled because Firebase is not configured. Solo mode works normally.',
 
     'game.deck': 'Deck:',
     'game.cards': 'cards',
@@ -373,6 +376,7 @@ const translations = {
     'footer.by': 'by',
     'footer.terms': 'Terms of Use',
     'footer.privacy': 'Privacy Policy',
+    'footer.kofi': 'Support on Ko-fi',
     'legal.close': 'Close',
 
     'help.title': 'How does it work?',

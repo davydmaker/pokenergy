@@ -7,7 +7,7 @@ import GameScreen from './components/GameScreen';
 import LobbyScreen from './multiplayer/LobbyScreen';
 import MultiGameScreen from './multiplayer/MultiGameScreen';
 import { createRoom, joinRoom } from './firebase/rooms';
-import { getPlayerId } from './firebase/config';
+import { getPlayerId, isFirebaseConfigured } from './firebase/config';
 
 type Screen =
   | { type: 'config' }
@@ -33,7 +33,7 @@ export default function App() {
   const { t } = useI18n();
   const [screen, setScreen] = useState<Screen>(() => {
     const roomId = getRoomFromHash();
-    if (roomId) return { type: 'rejoin', roomId };
+    if (roomId && isFirebaseConfigured) return { type: 'rejoin', roomId };
     return { type: 'config' };
   });
   const [loading, setLoading] = useState(false);
@@ -113,7 +113,8 @@ export default function App() {
       return (
         <ConfigScreen
           onStart={(config) => navigateTo({ type: 'game', config })}
-          onMultiplayer={() => navigateTo({ type: 'lobby' })}
+          onMultiplayer={isFirebaseConfigured ? () => navigateTo({ type: 'lobby' }) : undefined}
+          sandbox={!isFirebaseConfigured}
         />
       );
 
